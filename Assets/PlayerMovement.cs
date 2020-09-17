@@ -45,16 +45,24 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
+    //Stamina
+    CharacterController controller;
+    public static PlayerMovement instance;
+    
     void Awake()
     {
+        instance = this;          //Stamina
         rb = GetComponent<Rigidbody>();
     }
 
     void Start()
     {
         playerScale = transform.localScale;
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        //Stamina
+        controller = GetComponent<CharacterController> ();
     }
 
 
@@ -78,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
         crouching = Input.GetKey(KeyCode.LeftControl);
-
+        
         //Crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
             StartCrouch();
@@ -151,7 +159,16 @@ public class PlayerMovement : MonoBehaviour
 
         //Apply forces to move player
         rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV);
-        rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
+        if(Input.GetKeyDown(KeyCode.LeftShift))
+        {
+              rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier * 2);
+              Stamina.instance.UseStamina(40);
+		}
+        else
+        {
+            
+            rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
+        }
     }
 
     private void Jump()

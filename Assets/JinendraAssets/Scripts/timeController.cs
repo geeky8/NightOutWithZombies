@@ -1,54 +1,24 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class timeController : MonoBehaviour
 {
-    public static timeController instance;
-
-    public Text timeCounter;
-
-    private TimeSpan timePlaying;
-    private bool timerGoing;
-
-    private float elapsedTime;
-
-    private void Awake()
+    public Text timerText;
+    public float startTime;
+    
+    void Start()
     {
-        instance = this;
-    }
-
-    private void Start()
+        startTime = Time.time;
+	}
+    void Update()
     {
-        timeCounter.text = "Time: 00:00.00";
-        timerGoing = false;
-    }
+        float t = Time.time - startTime;
 
-    public void BeginTimer()
-    {
-        timerGoing = true;
-        elapsedTime = 0f;
+        string minutes = ((int) t / 60).ToString();
+        string seconds = (t % 60).ToString("F2");
 
-        StartCoroutine(UpdateTimer());
-    }
-
-    public void EndTimer()
-    {
-        timerGoing = false;
-    }
-
-    private IEnumerator UpdateTimer()
-    {
-        while (timerGoing)
-        {
-            elapsedTime += Time.deltaTime;
-            timePlaying = TimeSpan.FromSeconds(elapsedTime);
-            string timePlayingStr = "Time: " + timePlaying.ToString("mm':'ss'.'ff");
-            timeCounter.text = timePlayingStr;
-
-            yield return null;
-        }
+        timerText.text = minutes + ":" + seconds;
     }
 }
