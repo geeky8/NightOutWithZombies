@@ -1,9 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿// Some stupid rigidbody based movement by Dani
+
+using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+
     //Assingables
     public Transform playerCam;
     public Transform orientation;
@@ -13,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Rotation and look
     private float xRotation;
-    private float sensitivity = 500f;
+    private float sensitivity = 50f;
     private float sensMultiplier = 1f;
 
     //Movement
@@ -45,24 +47,16 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
-    //Stamina
-    CharacterController controller;
-    public static PlayerMovement instance;
-    
     void Awake()
     {
-        instance = this;          //Stamina
         rb = GetComponent<Rigidbody>();
     }
 
     void Start()
     {
         playerScale = transform.localScale;
-        //Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        //Stamina
-        controller = GetComponent<CharacterController> ();
     }
 
 
@@ -86,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
         crouching = Input.GetKey(KeyCode.LeftControl);
-        
+
         //Crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
             StartCrouch();
@@ -159,62 +153,10 @@ public class PlayerMovement : MonoBehaviour
 
         //Apply forces to move player
         rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV);
-        if(Input.GetKeyDown(KeyCode.LeftShift))
-        {
-              rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier * 2);
-              Stamina.instance.UseStamina(40);
-		}
-        else
-        {
-            
-            rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
-        }
+        rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
     }
 
-    private void Jump()
-    {
-        if (grounded && readyToJump)
-        {
-            readyToJump = false;
-
-            //Add jump forces
-            rb.AddForce(Vector2.up * jumpForce * 1.5f);
-            rb.AddForce(normalVector * jumpForce * 0.5f);
-
-            //If jumping while falling, reset y velocity.
-            Vector3 vel = rb.velocity;
-            if (rb.velocity.y < 0.5f)
-                rb.velocity = new Vector3(vel.x, 0, vel.z);
-            else if (rb.velocity.y > 0)
-                rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
-
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
-    }
-
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
-
-    private float desiredX;
-    private void Look()
-    {
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
-
-        //Find current look rotation
-        Vector3 rot = playerCam.transform.localRotation.eulerAngles;
-        desiredX = rot.y + mouseX;
-
-        //Rotate, and also make sure we dont over- or under-rotate.
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-        //Perform the rotations
-        playerCam.transform.localRotation = Quaternion.Euler(xRotation, desiredX, 0);
-        orientation.transform.localRotation = Quaternion.Euler(0, desiredX, 0);
-    }
+   
 
     private void CounterMovement(float x, float y, Vector2 mag)
     {
@@ -228,11 +170,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Counter movement
-        if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0))
+        if (Math.Abs(mag.x) > threshold && Math.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0))
         {
             rb.AddForce(moveSpeed * orientation.transform.right * Time.deltaTime * -mag.x * counterMovement);
         }
-        if (Mathf.Abs(mag.y) > threshold && Mathf.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0))
+        if (Math.Abs(mag.y) > threshold && Math.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0))
         {
             rb.AddForce(moveSpeed * orientation.transform.forward * Time.deltaTime * -mag.y * counterMovement);
         }
@@ -310,4 +252,5 @@ public class PlayerMovement : MonoBehaviour
     {
         grounded = false;
     }
+
 }
