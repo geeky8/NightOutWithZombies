@@ -2,41 +2,52 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour 
 {
-    public GameObject BloodEffect;
-    
-    public ProgressBar Pb;
-    public float damage = 5f;
-    private float MinHealth;
-    public float Delay = 10f;
+    public Slider staminaBar;
+    public float health=100;
+    public float regen = 2;
+    public float currenthealth;
+    public float damage = 20;
+    public int medkitCount = 0;
 
     private void Start()
     {
-        Pb.BarValue = 100;
+        currenthealth = health;
+        staminaBar.maxValue = health;
+        staminaBar.value = health;
+    }
+
+    private void Update()
+    {
+        if (currenthealth < 100)
+        {
+            currenthealth += regen * Time.deltaTime;
+            staminaBar.value = currenthealth;
+        }
     }
 
     void OnTriggerEnter(Collider collision)
     {
         if(collision.gameObject.tag == "Enemy")
         {
-            BloodEffect.SetActive(true);
-            StartCoroutine(SetFalse());
-            Pb.BarValue -= damage;
-            MinHealth = Pb.BarValue;
-            Debug.Log(MinHealth);
-
-            if(MinHealth == 0)
-            {
-                Debug.Log("GameOver");    
-			}
+            currenthealth = currenthealth - damage;
+            staminaBar.value = currenthealth;
 		}
+        if (currenthealth > 0)
+        {
+            StartCoroutine(Wait());
+        }
+        else
+        {
+            SceneManager.LoadScene(2);
+        }
     }
 
-    IEnumerator SetFalse()
+    IEnumerator Wait()
     {
-        yield return new WaitForSeconds(Delay);
-        BloodEffect.SetActive(false);
+        yield return new WaitForSeconds(2);
 	}
 }

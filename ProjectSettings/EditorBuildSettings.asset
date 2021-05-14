@@ -11,4 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Level1.unity
     guid: 6e20b8dd7c9ae2f478544401577c569f
+  - enabled: 1
+    path: Assets/game over sreen.unity
+    guid: 6313fd335ca3bc54aa4779d05eb17f2a
+  - enabled: 1
+    path: Assets/gamewon.unity
+    guid: 7c91a3352d13ade4081e823d14e76a67
+  - enabled: 1
+    path: Assets/Instructions.unity
+    guid: 7b228f801f6678141a80690fe4ff4992
   m_configObjects: {}
